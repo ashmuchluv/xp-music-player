@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XP Music Player</title>
+  <link rel="stylesheet" href="style.css" />
+<base target="_blank">
+</head>
+<body>
+
+  <div class="wmp-window">
+
+    <!-- BARRA DE TÍTULO -->
+    <div class="title-bar">
+      <div class="title-bar-left">
+        <span class="title-icon">♪</span>
+        <span class="title-text">Now Playing</span>
+      </div>
+      <div class="title-bar-buttons">
+        <button class="tbtn minimize" title="Minimizar">_</button>
+        <button class="tbtn maximize" title="Maximizar">□</button>
+        <button class="tbtn close" title="Fechar">×</button>
+      </div>
+    </div>
+
+    <!-- MENU BAR -->
+    <div class="menu-bar">
+      <span>File</span>
+      <span>View</span>
+      <span>Play</span>
+      <span>Tools</span>
+      <span>Help</span>
+    </div>
+
+    <!-- CORPO PRINCIPAL -->
+    <div class="player-body">
+
+      <!-- SIDEBAR ESQUERDA -->
+      <div class="sidebar">
+        <div class="sidebar-item active">
+          <span class="sidebar-arrow">▶</span> Now Playing
+        </div>
+        <div class="sidebar-item">Media Guide</div>
+        <div class="sidebar-item">Copy from CD</div>
+        <div class="sidebar-item">Media Library</div>
+        <div class="sidebar-item">Radio Tuner</div>
+        <div class="sidebar-item">Copy to CD or Device</div>
+        <div class="sidebar-item">Premium Services</div>
+        <div class="sidebar-item">Skin Chooser</div>
+      </div>
+
+      <!-- ÁREA CENTRAL -->
+      <div class="main-area">
+
+        <!-- CABEÇALHO: Artista e Música (inicialmente vazio) -->
+        <div class="track-header">
+          <div class="artist-name" id="artist-name">Aguardando música...</div>
+          <div class="track-name" id="track-name">—</div>
+        </div>
+
+        <!-- VISUALIZADOR -->
+        <div class="visualizer-container">
+          <canvas id="vis-canvas"></canvas>
+          <div class="vis-placeholder" id="vis-placeholder">
+            <div class="placeholder-content">
+              <span class="placeholder-icon">▶</span>
+              <span class="placeholder-text">Cole um link do YouTube abaixo e clique em Load</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BARRA DE URL -->
+        <div class="url-bar">
+          <input type="text" id="url-input" 
+                 placeholder="Cole aqui: youtube.com/watch?v=... ou youtu.be/..." />
+          <button onclick="loadURL()" class="load-btn">Load</button>
+        </div>
+
+        <!-- BARRA DE PROGRESSO -->
+        <div class="progress-section">
+          <div class="progress-track" id="progress-track" onclick="seekTo(event)">
+            <div class="progress-fill" id="progress-fill"></div>
+            <div class="progress-handle" id="progress-handle"></div>
+          </div>
+          <div class="time-display">
+            <span id="time-current">0:00</span>
+            <span id="time-total">0:00</span>
+          </div>
+        </div>
+
+        <!-- BOTÕES DE CONTROLE -->
+        <div class="controls-section">
+          <div class="controls-left">
+            <button class="ctrl-round" onclick="prevTrack()" title="Anterior (←)">
+              <span class="ctrl-icon">⏮</span>
+            </button>
+            <button class="ctrl-round play-btn" onclick="togglePlay()" id="play-btn" title="Play/Pause (Espaço)">
+              <span class="ctrl-icon">▶</span>
+            </button>
+            <button class="ctrl-round" onclick="stopPlayer()" title="Stop">
+              <span class="ctrl-icon">⏹</span>
+            </button>
+            <button class="ctrl-round" onclick="nextTrack()" title="Próxima (→)">
+              <span class="ctrl-icon">⏭</span>
+            </button>
+          </div>
+
+          <div class="controls-right">
+            <button class="ctrl-round small" onclick="toggleMute()" id="mute-btn" title="Mudo (M)">
+              <span class="ctrl-icon">🔊</span>
+            </button>
+            <div class="volume-area">
+              <input type="range" id="vol-slider" min="0" max="100" value="80"
+                     oninput="setVolume(this.value)" title="Volume" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STATUS BAR -->
+        <div class="status-section">
+          <div class="status-left">
+            <span class="status-label">Battery</span>
+            <span class="status-separator">:</span>
+            <span class="status-value" id="vis-mode">Randomization</span>
+          </div>
+          <div class="status-center">
+            <span class="status-label">Artist</span>
+            <span class="status-separator">:</span>
+            <span class="status-value" id="status-artist">—</span>
+          </div>
+          <div class="status-right">
+            <button class="badge" id="shuffle-badge" onclick="toggleShuffle()">Shuffle: OFF</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PAINEL DIREITO -->
+      <div class="right-panel">
+        <div class="panel-header">
+          <span>Now Playing</span>
+          <span class="panel-subtitle">Find Album Info</span>
+        </div>
+
+        <div class="album-section">
+          <div class="album-art" id="album-art">
+            <span class="album-placeholder">♪</span>
+          </div>
+          <div class="album-title" id="album-title">—</div>
+        </div>
+
+        <div class="queue-section" id="queue-list">
+          <div class="queue-empty">A fila aparece aqui</div>
+        </div>
+
+        <div class="total-time-bar">
+          <span>Total Time: <span id="total-time">—</span></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Player do YouTube (invisível) -->
+    <div id="yt-player-wrap">
+      <div id="yt-player"></div>
+    </div>
+
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="player.js"></script>
+</body>
+</html>

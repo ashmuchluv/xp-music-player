@@ -1,5 +1,5 @@
 /* ============================================
-   RESET E CONFIGURAÇÃO BASE
+   RESET
    ============================================
 */
 * { 
@@ -8,269 +8,90 @@
   padding: 0; 
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: url('imagens/winxp.png') no-repeat center;
+  background-size: cover;
+}
+
 body {
-  background: #3a7d3a;
-  background-image: 
-    radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Tahoma', 'Segoe UI', sans-serif;
-  font-size: 11px;
-  overflow: hidden;
-}
-
-/* ============================================
-   JANELA PRINCIPAL (WMP Window)
-   ============================================
-   Simula a janela do Windows Media Player 10:
-   - Borda azul escura com sombra 3D
-   - Cantos arredondados no topo
-   - Fundo bege claro (#ece9d8)
-   - Sombra externa para efeito flutuante
-*/
-.wmp-window {
-  width: 720px;
-  border: 2px solid #003c74;
-  border-radius: 8px 8px 0 0;
-  box-shadow: 
-    inset 1px 1px 0 #6ab0f5,
-    inset -1px -1px 0 #0a2f80,
-    3px 3px 12px rgba(0,0,0,0.5);
-  overflow: hidden;
-  background: #ece9d8;
-}
-
-/* ============================================
-   BARRA DE TÍTULO (Title Bar)
-   ============================================
-   Gradiente azul característico do Windows XP:
-   - Topo: azul claro (#2569c3)
-   - Meio: azul médio (#1447a0)  
-   - Base: azul escuro (#1d56b5)
-   - Texto branco com sombra suave
-*/
-.title-bar {
-  background: linear-gradient(to bottom, 
-    #2569c3 0%, 
-    #1447a0 50%, 
-    #1d56b5 100%);
-  color: white;
-  padding: 4px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 28px;
-  border-bottom: 1px solid #0a2f80;
-  border-radius: 6px 6px 0 0;
-}
-
-.title-bar-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.title-icon {
-  font-size: 14px;
-  color: #fff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-.title-text {
-  font-weight: bold;
-  font-size: 12px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-/* Botões da title bar */
-.title-bar-buttons { 
-  display: flex; 
-  gap: 2px; 
-}
-
-.tbtn {
-  width: 21px;
-  height: 21px;
-  border: 1px solid #1a4fa0;
-  border-radius: 3px;
-  background: linear-gradient(to bottom, #4a90d9, #2060b8);
-  color: white;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
   font-family: 'Tahoma', sans-serif;
-  line-height: 1;
-}
-
-.tbtn.close { 
-  background: linear-gradient(to bottom, #e05555, #b82020); 
-  border-color: #8b2020;
-}
-
-.tbtn:hover { 
-  filter: brightness(1.15); 
-}
-
-.tbtn:active { 
-  filter: brightness(0.9); 
-  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
-}
-
-/* ============================================
-   MENU BAR (File, View, Play, Tools, Help)
-   ============================================
-   Barra de menus clássica do Windows:
-   - Fundo bege (#ece9d8)
-   - Texto preto
-   - Hover: fundo azul (#316ac5), texto branco
-*/
-.menu-bar {
-  background: #ece9d8;
-  border-bottom: 1px solid #aca899;
-  padding: 1px 4px;
-  display: flex;
-  gap: 0;
-}
-
-.menu-bar span {
-  padding: 2px 10px;
-  cursor: pointer;
-  border-radius: 3px;
-  color: #000;
   font-size: 11px;
-  letter-spacing: 0.5px;
-}
-
-.menu-bar span:hover { 
-  background: #316ac5; 
-  color: #fff; 
 }
 
 /* ============================================
-   CORPO PRINCIPAL - 3 COLUNAS
+   WRAPPER - Escala para caber na tela
    ============================================
-   Layout flexbox:
-   - Sidebar: 120px (fixo)
-   - Main: flexível (ocupa o resto)
-   - Right Panel: 160px (fixo)
 */
-.player-body {
-  display: flex;
-  height: 430px;
-  background: #ece9d8;
+.player-wrapper {
+  width: 1440px;
+  height: 1000px;
+  position: relative;
+  /* O JavaScript vai aplicar transform: scale() */
 }
 
 /* ============================================
-   SIDEBAR ESQUERDA (Menu azul)
+   IMAGEM DE FUNDO
    ============================================
-   Igual ao WMP 10:
-   - Fundo azul escuro (#2a5ba8)
-   - Itens com texto azul claro (#cce0ff)
-   - Hover/Ativo: fundo mais escuro (#1a3f80), texto branco
-   - Seta (▶) no item ativo
 */
-.sidebar {
-  width: 120px;
-  background: linear-gradient(to bottom, #2a5ba8, #1e4a8c);
-  border-right: 2px solid #1a3f80;
-  flex-shrink: 0;
-  padding-top: 2px;
-}
-
-.sidebar-item {
-  padding: 5px 8px 5px 6px;
-  color: #cce0ff;
-  font-size: 11px;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  line-height: 1.3;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.sidebar-arrow {
-  font-size: 8px;
-  color: #fff;
-  opacity: 0;
-}
-
-.sidebar-item.active .sidebar-arrow {
-  opacity: 1;
-}
-
-.sidebar-item:hover { 
-  background: rgba(0,0,0,0.15); 
-  color: #fff; 
-}
-
-.sidebar-item.active {
-  background: #1a3f80;
-  color: #fff;
-  font-weight: bold;
+.bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('imagens/media player.png') no-repeat center;
+  background-size: 1440px 1000px;
+  z-index: 1;
 }
 
 /* ============================================
-   ÁREA CENTRAL (Main Area)
+   ÁREA PRETA (visualizador)
    ============================================
-   Contém:
-   - Track header (artista + música)
-   - Visualizador (canvas)
-   - URL bar
-   - Progress bar
-   - Controles redondos
-   - Status bar
+   Posição na imagem: X=315, Y=160, W=680, H=430
 */
-.main-area {
-  flex: 1;
+.area-preta {
+  position: absolute;
+  left: 215px;
+  top: 180px;
+  width: 900px;
+  height: 613px;
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  background: #000;
-  gap: 0;
-  min-width: 0;
+  padding: 16px;
 }
 
-/* Cabeçalho com artista e música */
-.track-header {
-  padding: 6px 10px 2px 10px;
-  background: #000;
+/* Nome artista/música */
+.track-info {
+  margin-bottom: 9px;
 }
 
 .artist-name { 
-  font-size: 11px; 
-  color: #aaa; 
-  line-height: 1.2;
+  font-size: 14px; 
+  color: #bbb; 
 }
 
 .track-name { 
-  font-size: 20px; 
+  font-size: 22px; 
   font-weight: bold; 
   color: #fff; 
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
-/* ============================================
-   VISUALIZADOR (Canvas)
-   ============================================
-   Tela preta onde o canvas desenha as ondas.
-   Borda inset para efeito 3D de tela.
-*/
-.visualizer-container {
+/* Visualizador */
+.visualizer-box {
   flex: 1;
   background: #000;
-  border: 2px inset #333;
+  border-radius: 4px;
   position: relative;
   overflow: hidden;
-  margin: 4px 8px;
-  min-height: 180px;
+  margin-bottom: 10px;
 }
 
 #vis-canvas { 
@@ -279,380 +100,85 @@ body {
   display: block; 
 }
 
-/* Placeholder quando não há música */
 .vis-placeholder {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #555;
+  font-size: 14px;
   pointer-events: none;
 }
 
-.placeholder-content {
+.vis-placeholder span {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Barra de URL */
+.url-bar {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 8px;
-  color: #555;
-}
-
-.placeholder-icon {
-  font-size: 24px;
-  color: #444;
-}
-
-.placeholder-text {
-  font-size: 12px;
-  color: #555;
-}
-
-/* ============================================
-   BARRA DE URL
-   ============================================
-   Input escuro estilo terminal + botão Load
-*/
-.url-bar { 
-  display: flex; 
-  gap: 4px; 
-  padding: 4px 8px;
-  background: #000;
+  height: 32px;
 }
 
 .url-bar input {
   flex: 1;
   background: #1a1a1a;
   border: 1px solid #555;
-  border-radius: 2px;
+  border-radius: 3px;
   color: #0f0;
   font-family: 'Courier New', monospace;
-  font-size: 11px;
-  padding: 4px 8px;
-  outline: none;
-}
-
-.url-bar input:focus { 
-  border-color: #0f0; 
-  box-shadow: 0 0 4px rgba(0,255,0,0.3);
+  font-size: 12px;
+  padding: 5px 10px;
 }
 
 .url-bar input::placeholder {
-  color: #555;
+  color: #666;
 }
 
-.load-btn {
-  padding: 4px 14px;
-  background: linear-gradient(to bottom, #f0ede0, #d4d0c4);
-  border: 1px solid #888;
-  border-top-color: #fff;
-  border-left-color: #fff;
+.url-bar button {
+  padding: 5px 16px;
+  background: linear-gradient(to bottom, #4a90d9, #2060b8);
+  border: 1px solid #1a4fa0;
   border-radius: 3px;
-  font-family: 'Tahoma', sans-serif;
-  font-size: 11px;
-  cursor: pointer;
-  color: #000;
+  color: #fff;
   font-weight: bold;
-}
-
-.load-btn:hover { 
-  background: linear-gradient(to bottom, #d8ecff, #b8d8f8); 
-}
-
-.load-btn:active { 
-  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
-  border-top-color: #888;
-  border-left-color: #888;
+  cursor: pointer;
 }
 
 /* ============================================
-   BARRA DE PROGRESSO
+   ÁREA AZUL (painel direito)
    ============================================
-   Estilo WMP 10:
-   - Fundo escuro com borda inset
-   - Preenchimento verde brilhante
-   - Handle (botão de arrastar) verde
+   Posição: X=1020, Y=160, W=340, H=430
 */
-.progress-section {
-  padding: 4px 8px;
-  background: #000;
-}
-
-.progress-track {
-  height: 10px;
-  background: #1a1a1a;
-  border: 1px inset #555;
-  border-radius: 2px;
-  overflow: visible;
-  cursor: pointer;
-  position: relative;
-}
-
-.progress-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(to bottom, #80ff40, #40c000);
-  border-radius: 1px;
-  transition: width 0.3s linear;
-  position: relative;
-}
-
-/* Handle (ponto verde que marca a posição) */
-.progress-handle {
+.area-azul {
   position: absolute;
-  top: 50%;
-  left: 0%;
-  transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
-  background: #80ff40;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  box-shadow: 0 0 4px rgba(0,0,0,0.5);
-  pointer-events: none;
-}
-
-.time-display {
-  display: flex;
-  justify-content: space-between;
-  color: #0f0;
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-  margin-top: 3px;
-}
-
-/* ============================================
-   BOTÕES DE CONTROLE - ESTILO WMP 10/11
-   ============================================
-   Botões REDONDOS com aparência 3D metálica!
-   - Fundo gradiente prateado
-   - Borda escura com brilho interno
-   - Efeito de pressionar (inverte sombras)
-   - Ícones centralizados
-*/
-.controls-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 8px;
-  background: #000;
-  border-top: 1px solid #333;
-}
-
-.controls-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.controls-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Botão redondo principal */
-.ctrl-round {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid #666;
-  border-top-color: #999;
-  border-left-color: #999;
-  background: linear-gradient(145deg, #e0e0e0, #a0a0a0);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 
-    0 2px 4px rgba(0,0,0,0.4),
-    inset 0 1px 2px rgba(255,255,255,0.5);
-  transition: all 0.1s;
-}
-
-.ctrl-round:hover {
-  background: linear-gradient(145deg, #f0f0f0, #b0b0b0);
-  border-color: #777;
-  border-top-color: #aaa;
-  border-left-color: #aaa;
-}
-
-/* Efeito de botão pressionado */
-.ctrl-round:active {
-  background: linear-gradient(145deg, #909090, #c0c0c0);
-  border-top-color: #555;
-  border-left-color: #555;
-  border-bottom-color: #999;
-  border-right-color: #999;
-  box-shadow: 
-    inset 0 2px 4px rgba(0,0,0,0.3),
-    0 1px 1px rgba(0,0,0,0.2);
-  transform: translateY(1px);
-}
-
-/* Botão play maior e destacado */
-.ctrl-round.play-btn {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(145deg, #e8e8e8, #b0b0b0);
-}
-
-.ctrl-round.play-btn:hover {
-  background: linear-gradient(145deg, #f5f5f5, #c0c0c0);
-}
-
-/* Botão pequeno (mute) */
-.ctrl-round.small {
-  width: 26px;
-  height: 26px;
-}
-
-.ctrl-round.small .ctrl-icon {
-  font-size: 12px;
-}
-
-/* Ícone dentro do botão */
-.ctrl-icon {
-  font-size: 14px;
-  color: #333;
-  line-height: 1;
-  pointer-events: none;
-}
-
-/* Área do volume */
-.volume-area {
-  display: flex;
-  align-items: center;
-}
-
-#vol-slider { 
-  width: 80px;
-  height: 16px; 
-  cursor: pointer;
-  accent-color: #80ff40;
-}
-
-/* ============================================
-   STATUS BAR (Battery, Artist, Shuffle)
-   ============================================
-   Estilo WMP 10:
-   - Fundo preto
-   - Texto verde (estilo terminal)
-   - Labels e valores separados por ":"
-*/
-.status-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 8px;
-  background: #000;
-  border-top: 1px solid #333;
-  color: #0f0;
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-}
-
-.status-left, .status-center {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.status-label {
-  color: #0a0;
-  font-weight: bold;
-}
-
-.status-separator {
-  color: #0a0;
-}
-
-.status-value {
-  color: #0f0;
-}
-
-/* Badge do Shuffle */
-.badge {
-  background: #222;
-  border: 1px solid #444;
-  border-radius: 3px;
-  padding: 2px 8px;
-  cursor: pointer;
-  color: #0f0;
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-}
-
-.badge:hover { 
-  background: #333; 
-}
-
-.badge.active {
-  background: #1a4a1a;
-  border-color: #0f0;
-  color: #0f0;
-}
-
-/* ============================================
-   PAINEL DIREITO (Now Playing + Album + Queue)
-   ============================================
-   Igual ao WMP 10:
-   - Largura fixa: 160px
-   - Fundo bege (#ece9d8)
-   - Borda à esquerda
-*/
-.right-panel {
-  width: 160px;
-  flex-shrink: 0;
-  background: #ece9d8;
-  border-left: 2px solid #aca899;
+  left: 1094px;
+  top: 181px;
+  width: 340px;
+  height: 589px;
+  z-index: 10;
   display: flex;
   flex-direction: column;
+  padding: 50px 20px 10px 20px;
 }
 
-/* Cabeçalho do painel */
-.panel-header {
-  background: linear-gradient(to bottom, #2569c3, #1447a0);
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 3px 8px;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.panel-subtitle {
-  font-size: 9px;
-  font-weight: normal;
-  color: #cce0ff;
-  cursor: pointer;
-}
-
-.panel-subtitle:hover {
-  color: #fff;
-  text-decoration: underline;
-}
-
-/* Seção do álbum */
-.album-section {
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  border-bottom: 1px solid #aca899;
-  background: #ece9d8;
-}
-
+/* Capa */
 .album-art {
-  width: 100px;
-  height: 100px;
+  width: 198px;
+  height: 200px;
   background: #ddd;
-  border: 2px inset #aca899;
+  border: 2px inset #888;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto 10px auto;
   overflow: hidden;
 }
 
@@ -662,66 +188,63 @@ body {
   object-fit: cover;
 }
 
-.album-placeholder {
-  font-size: 32px;
+.album-art span {
+  font-size: 48px;
   color: #888;
 }
 
+/* Nome do álbum */
 .album-title { 
-  font-size: 11px; 
+  font-size: 13px; 
   font-weight: bold; 
-  color: #000; 
+  color: #fff; 
   text-align: center;
-  max-width: 100%;
+  margin-bottom: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Seção da fila */
-.queue-section { 
+/* Fila */
+.queue-list { 
   flex: 1; 
   overflow-y: auto; 
-  background: #ece9d8;
+  margin-bottom: 8px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 4px;
+  padding: 5px;
 }
 
 .queue-empty { 
-  padding: 8px; 
-  color: #888; 
-  font-size: 11px; 
+  padding: 10px; 
+  color: #aaa; 
+  font-size: 12px; 
   text-align: center; 
 }
 
 .queue-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
+  gap: 8px;
+  padding: 5px 8px;
   cursor: pointer;
-  border-bottom: 1px solid #ddd;
-  font-size: 11px;
-  color: #000;
-  background: #ece9d8;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 12px;
+  color: #fff;
 }
 
 .queue-item:hover { 
-  background: #d8ecff; 
+  background: rgba(255,255,255,0.1); 
 }
 
 .queue-item.active { 
-  background: #316ac5; 
-  color: #fff; 
+  background: rgba(49, 106, 197, 0.5); 
 }
 
 .q-num { 
-  color: #888; 
-  min-width: 16px; 
-  font-size: 10px; 
-  font-family: 'Courier New', monospace;
-}
-
-.queue-item.active .q-num { 
-  color: #cce0ff; 
+  color: #aaa; 
+  min-width: 18px; 
+  font-size: 11px; 
 }
 
 .q-title { 
@@ -732,31 +255,207 @@ body {
 }
 
 .q-dur { 
-  color: #888; 
-  font-size: 10px; 
-  font-family: 'Courier New', monospace;
+  color: #aaa; 
+  font-size: 11px; 
 }
 
-.queue-item.active .q-dur { 
-  color: #cce0ff; 
-}
-
-/* Barra de tempo total */
-.total-time-bar {
-  padding: 4px 8px;
-  font-size: 10px;
-  color: #444;
-  border-top: 1px solid #aca899;
+/* Total time */
+.total-time {
+  padding: 5px 8px;
+  font-size: 12px;
+  color: #ccc;
   text-align: right;
-  background: #ece9d8;
-  font-family: 'Tahoma', sans-serif;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Scrollbar */
+.queue-list::-webkit-scrollbar {
+  width: 8px;
+}
+.queue-list::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+}
+.queue-list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+  border-radius: 4px;
 }
 
 /* ============================================
-   PLAYER DO YOUTUBE (INVISÍVEL)
+   BARRA DE PROGRESSO
    ============================================
-   O iframe fica fora da tela. Não queremos ver
-   o vídeo, só ouvir o áudio via API.
+   Posição: Y ~780, sobre a barra verde
+*/
+.progress-bar {
+  position: absolute;
+  left: 230px;
+  bottom: 197px;
+  width: 1171px;
+  z-index: 10;
+}
+
+.progress-track {
+  height: 17px;
+  background: rgba(0,0,0,0.5);
+  border: 1px inset #555;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to bottom, #80ff40, #40c000);
+  border-radius: 6px;
+}
+
+.progress-handle {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  width: 45px;
+  height: 23px;
+  background: #80ff40;
+  border: 2px solid #b1b1b1;
+  border-radius: 34%;
+  pointer-events: none;
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  color: rgb(46, 46, 46);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  margin-top: -35px;
+}
+
+/* ============================================
+   STATUS BAR
+   ============================================
+   Posição: Y ~810
+*/
+.status-bar {
+  position: absolute;
+  left: 330px;
+  bottom: 197px;
+  width: 500px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgb(65, 65, 65);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  z-index: 10;
+}
+
+.status-bar button {
+  background: rgba(0,0,0,0.5);
+  border: 1px solid #444;
+  border-radius: 3px;
+  padding: 3px 10px;
+  cursor: pointer;
+  color: rgb(201, 255, 201);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+}
+
+/* ============================================
+   BOTÕES (imagens PNG)
+   ============================================
+   Posição: Y ~830 (barra inferior)
+   Tamanho das imagens: 76x62 px
+*/
+
+.btn-img {
+  position: absolute;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 20;
+  transition: filter 0.2s;
+}
+
+.btn-img img {
+  width: 60px;
+  height: 49px;
+  display: block;
+}
+
+.btn-img:hover {
+  filter: brightness(1.2);
+}
+
+.btn-img:active {
+  transform: translateY(2px);
+}
+
+/* ============================================
+   BOTÃO PLAY (MAIOR E SEPARADO)
+   ============================================
+*/
+
+.btn-img.play img {
+  width: 90px;    /* MAIOR que os outros! */
+  height: 74px;   /* Proporcional */
+}
+
+/* Posição do Play (ajuste se necessário) */
+.btn-img.play {
+  left: 385px;    /* Centralizado entre os botões */
+  bottom: 100px;  /* Mesmo bottom dos outros */
+}
+
+/* Posições individuais */
+.btn-img.prev { left: 430px; bottom: 88px; }
+.btn-img.play { left: 220px; bottom: 77px; }
+.btn-img.stop { left: 312px; bottom: 88px; }
+.btn-img.next { left: 495px; bottom: 88px; }
+.btn-img.mute { left: 600px; bottom: 88px; }
+
+/* Ícone de pause (por cima do botão play) */
+.pause-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: #333;
+  display: none;
+  pointer-events: none;
+  font-weight: bold;
+}
+
+.btn-img.play.playing .pause-icon {
+  display: block;
+}
+
+.btn-img.play.playing img {
+  opacity: 0.6;
+}
+
+/* ============================================
+   VOLUME SLIDER
+   ============================================
+*/
+.volume-box {
+  position: absolute;
+  left: 670px;
+  bottom: 103px;
+  width: 100px;
+  z-index: 20;
+}
+
+.volume-box input {
+  width: 100%;
+  accent-color: #80ff40;
+}
+
+/* ============================================
+   PLAYER YOUTUBE (invisível)
+   ============================================
 */
 #yt-player-wrap {
   position: fixed;
@@ -764,108 +463,5 @@ body {
   left: -9999px;
   width: 1px;
   height: 1px;
-  overflow: hidden;
 }
 
-/* ============================================
-   SCROLLBAR PERSONALIZADA (Estilo XP)
-   ============================================
-   Deixa a scrollbar da fila igual ao Windows XP.
-*/
-.queue-section::-webkit-scrollbar {
-  width: 14px;
-}
-
-.queue-section::-webkit-scrollbar-track {
-  background: #f0ede0;
-  border-left: 1px solid #aca899;
-}
-
-.queue-section::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #d4d0c4, #b8b4a8);
-  border: 1px solid #888;
-  border-radius: 2px;
-}
-
-.queue-section::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #e0dcd0, #c4c0b4);
-}
-
-/* ============================================
-   ANIMAÇÕES
-   ============================================
-*/
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.placeholder-icon {
-  animation: pulse 2s infinite;
-}
-
-/* ============================================
-   RESPONSIVIDADE BÁSICA
-   ============================================
-*/
-@media (max-width: 740px) {
-  .wmp-window {
-    width: 100%;
-    max-width: 720px;
-    margin: 0 10px;
-  }
-
-  .right-panel {
-    width: 140px;
-  }
-
-  .sidebar {
-    width: 100px;
-  }
-
-  .ctrl-round {
-    width: 28px;
-    height: 28px;
-  }
-
-  .ctrl-round.play-btn {
-    width: 34px;
-    height: 34px;
-  }
-}
-
-
-/* ============================================
-   PLACEHOLDER DE ERRO (vídeo não permite embed)
-   ============================================
-*/
-.placeholder-content.error {
-  color: #ff6b6b;
-}
-
-.placeholder-content.error .placeholder-icon {
-  color: #ff6b6b;
-  font-size: 28px;
-}
-
-.placeholder-content.error .placeholder-text {
-  color: #ff6b6b;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-.placeholder-subtext {
-  color: #888;
-  font-size: 11px;
-  margin-top: 4px;
-}
-
-/* Placeholder de carregamento */
-.placeholder-content .placeholder-icon {
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}

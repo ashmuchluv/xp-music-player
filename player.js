@@ -1,5 +1,5 @@
 // ============================================
-// XP MUSIC PLAYER - JavaScript (Corrigido)
+// XP MUSIC PLAYER - JavaScript
 // ============================================
 
 let player = null;
@@ -10,9 +10,8 @@ let currentTrackIndex = -1;
 let playlist = [];
 let progressInterval = null;
 let visualizerInterval = null;
-let visMode = 'Randomization';
 
-// Referências aos elementos HTML
+// Elementos
 const els = {
   artistName: document.getElementById('artist-name'),
   trackName: document.getElementById('track-name'),
@@ -27,6 +26,7 @@ const els = {
   progressHandle: document.getElementById('progress-handle'),
   progressTrack: document.getElementById('progress-track'),
   playBtn: document.getElementById('play-btn'),
+  pauseIcon: document.getElementById('pause-icon'),
   muteBtn: document.getElementById('mute-btn'),
   statusText: document.getElementById('vis-mode'),
   shuffleBadge: document.getElementById('shuffle-badge'),
@@ -37,25 +37,16 @@ const els = {
 };
 
 // ============================================
-// 1. INICIALIZAÇÃO DA YOUTUBE IFRAME API
+// YOUTUBE API
 // ============================================
 
 function onYouTubeIframeAPIReady() {
-  console.log('🎵 YouTube API carregada!');
-
   player = new YT.Player('yt-player', {
-    height: '1',
-    width: '1',
+    height: '1', width: '1',
     playerVars: {
-      autoplay: 0,
-      controls: 0,
-      disablekb: 1,
-      fs: 0,
-      rel: 0,
-      modestbranding: 1,
-      iv_load_policy: 3,
-      playsinline: 1,
-      origin: window.location.origin  // IMPORTANTE: evita erros de embed
+      autoplay: 0, controls: 0, disablekb: 1, fs: 0,
+      rel: 0, modestbranding: 1, iv_load_policy: 3, playsinline: 1,
+      origin: window.location.origin
     },
     events: {
       onReady: onPlayerReady,
@@ -65,36 +56,24 @@ function onYouTubeIframeAPIReady() {
   });
 }
 
-// ============================================
-// 2. EVENTOS DO PLAYER
-// ============================================
-
 function onPlayerReady(event) {
-  console.log('✅ Player pronto!');
   setVolume(80);
-  updateStatus('Randomization');
 }
 
 function onPlayerStateChange(event) {
-  console.log('📊 Estado:', event.data);
-
   switch(event.data) {
     case YT.PlayerState.PLAYING:
       isPlaying = true;
       updatePlayButton();
-      updateStatus('Randomization');
       startProgressTimer();
       startVisualizer();
       break;
-
     case YT.PlayerState.PAUSED:
       isPlaying = false;
       updatePlayButton();
-      updateStatus('Paused');
       stopProgressTimer();
       stopVisualizer();
       break;
-
     case YT.PlayerState.ENDED:
       isPlaying = false;
       updatePlayButton();
@@ -102,149 +81,50 @@ function onPlayerStateChange(event) {
       stopVisualizer();
       handleTrackEnd();
       break;
-
-    case YT.PlayerState.BUFFERING:
-      updateStatus('Buffering...');
-      break;
-
-    case YT.PlayerState.CUED:
-      updateStatus('Ready');
-      break;
   }
 }
 
-// ============================================
-// 3. TRATAMENTO DE ERROS (CORRIGIDO!)
-// ============================================
-
 function onPlayerError(event) {
-  const errorCode = event.data;
-  console.error('❌ Erro do YouTube. Código:', errorCode);
-
-  let errorMessage = '';
-
-  switch(errorCode) {
-    case 2:
-      errorMessage = 'Parâmetro inválido';
-      break;
-    case 5:
-      errorMessage = 'Erro no player HTML5';
-      break;
-    case 100:
-      errorMessage = 'Vídeo não encontrado (removido)';
-      break;
-    case 101:
-    case 150:
-      errorMessage = 'Vídeo não permite embed (bloqueado pelo autor)';
-      // MOSTRA ALERTA AMIGÁVEL AO USUÁRIO
-      showEmbedError();
-      break;
-    default:
-      errorMessage = 'Erro desconhecido: ' + errorCode;
+  console.error('Erro YouTube:', event.data);
+  if (event.data === 150 || event.data === 101) {
+    showEmbedError();
   }
-
-  updateStatus('Error: ' + errorCode);
-
-  // Para o visualizador e progresso
   stopProgressTimer();
   stopVisualizer();
   isPlaying = false;
   updatePlayButton();
-
-  // Se for erro 150, não tenta próxima música automaticamente
-  // (provavelmente todos os vídeos desse artista estão bloqueados)
-  if (errorCode !== 150 && errorCode !== 101) {
-    setTimeout(() => {
-      if (playlist.length > 0) nextTrack();
-    }, 3000);
-  }
 }
 
-// Mostra mensagem amigável quando vídeo não permite embed
 function showEmbedError() {
-  // Atualiza o placeholder com mensagem de erro
   els.visPlaceholder.style.display = 'flex';
-  els.visPlaceholder.innerHTML = `
-    <div class="placeholder-content error">
-      <span class="placeholder-icon">⚠️</span>
-      <span class="placeholder-text">Este vídeo não permite reprodução externa</span>
-      <span class="placeholder-subtext">Tente outro vídeo (covers, independentes, etc.)</span>
-    </div>
-  `;
-
-  // Reseta as informações da música
-  els.artistName.textContent = 'Erro ao carregar';
+  els.visPlaceholder.innerHTML = '<span style="color:#ff6b6b">⚠️ Vídeo não permite embed</span>';
+  els.artistName.textContent = 'Erro';
   els.trackName.textContent = 'Vídeo bloqueado';
-  els.statusArtist.textContent = '—';
-  els.albumTitle.textContent = '—';
-  els.albumArt.innerHTML = '<span class="album-placeholder">⚠️</span>';
 }
 
 // ============================================
-// 4. CARREGAR URL DO YOUTUBE (CORRIGIDO!)
+// CARREGAR URL
 // ============================================
 
 function loadURL() {
   const url = els.urlInput.value.trim();
+  if (!url) { alert('Cole um link do YouTube!'); return; }
 
-  if (!url) {
-    alert('Cole um link do YouTube!\n\nExemplos:\n• youtube.com/watch?v=XXXX\n• youtu.be/XXXX');
-    return;
-  }
-
-  console.log('🔗 URL:', url);
-
-  // Limpa mensagem de erro anterior
-  els.visPlaceholder.style.display = 'flex';
-  els.visPlaceholder.innerHTML = `
-    <div class="placeholder-content">
-      <span class="placeholder-icon">⏳</span>
-      <span class="placeholder-text">Carregando...</span>
-    </div>
-  `;
-
-  const playlistId = extractPlaylistId(url);
   const videoId = extractVideoId(url);
+  const playlistId = extractPlaylistId(url);
 
-  if (playlistId) {
-    console.log('📋 Playlist:', playlistId);
+  if (videoId) {
+    loadSingleVideo(videoId);
+  } else if (playlistId) {
     loadPlaylist(playlistId);
-  } else if (videoId) {
-    console.log('🎬 Vídeo:', videoId);
-    loadSingleVideo(videoId, url);
   } else {
-    alert('Link inválido!\nFormatos aceitos:\n• youtube.com/watch?v=XXXXX\n• youtu.be/XXXXX\n• youtube.com/playlist?list=XXXXX');
-    resetPlaceholder();
+    alert('Link inválido!');
   }
 }
-
-function resetPlaceholder() {
-  els.visPlaceholder.style.display = 'flex';
-  els.visPlaceholder.innerHTML = `
-    <div class="placeholder-content">
-      <span class="placeholder-icon">▶</span>
-      <span class="placeholder-text">Cole um link do YouTube abaixo e clique em Load</span>
-    </div>
-  `;
-}
-
-// ============================================
-// 5. EXTRAIR IDs DOS LINKS
-// ============================================
 
 function extractVideoId(url) {
-  const patterns = [
-    /youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11})/,
-    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
-    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
-    /youtube\.com\/v\/([a-zA-Z0-9_-]{11})/
-  ];
-
-  for (let pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) return match[1];
-  }
-  return null;
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : null;
 }
 
 function extractPlaylistId(url) {
@@ -252,57 +132,34 @@ function extractPlaylistId(url) {
   return match ? match[1] : null;
 }
 
-// ============================================
-// 6. CARREGAR VÍDEO SOLO
-// ============================================
-
-function loadSingleVideo(videoId, url) {
-  // Remove parâmetros extras da URL (como &si=, &feature=, etc.)
-  const cleanVideoId = videoId.split('&')[0];
-
+function loadSingleVideo(videoId) {
   playlist = [{
-    id: cleanVideoId,
+    id: videoId,
     title: 'Carregando...',
     artist: 'YouTube',
     duration: 0,
-    thumbnail: `https://img.youtube.com/vi/${cleanVideoId}/mqdefault.jpg`
+    thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
   }];
-
   currentTrackIndex = 0;
   renderQueue();
 
-  // USA loadVideoById (mais confiável que cueVideoById)
   if (player && player.loadVideoById) {
-    player.loadVideoById(cleanVideoId);
+    player.loadVideoById(videoId);
     els.visPlaceholder.style.display = 'none';
-    updateStatus('Loading...');
   }
 
-  fetchVideoInfo(cleanVideoId);
+  fetchVideoInfo(videoId);
 }
 
-// Busca informações do vídeo via oEmbed
 async function fetchVideoInfo(videoId) {
   try {
-    const response = await fetch(
-      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`
-    );
-
-    if (!response.ok) {
-      throw new Error('oEmbed falhou');
-    }
-
-    const data = await response.json();
-
-    playlist[0].title = data.title || 'Título Desconhecido';
-    playlist[0].artist = data.author_name || 'Artista Desconhecido';
-
+    const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+    const data = await res.json();
+    playlist[0].title = data.title || 'Desconhecido';
+    playlist[0].artist = data.author_name || 'Desconhecido';
     updateTrackInfo(0);
     renderQueue();
-
-  } catch (e) {
-    console.log('Não foi possível buscar informações:', e);
-    // Mantém título genérico
+  } catch(e) {
     playlist[0].title = 'Vídeo do YouTube';
     playlist[0].artist = 'YouTube';
     updateTrackInfo(0);
@@ -310,58 +167,36 @@ async function fetchVideoInfo(videoId) {
   }
 }
 
-// ============================================
-// 7. CARREGAR PLAYLIST
-// ============================================
-
 function loadPlaylist(playlistId) {
-  // Para playlists, usamos loadPlaylist da API
   if (player && player.loadPlaylist) {
-    player.loadPlaylist({
-      list: playlistId,
-      listType: 'playlist',
-      index: 0
-    });
+    player.loadPlaylist({ list: playlistId, listType: 'playlist', index: 0 });
   }
-
   playlist = [];
   currentTrackIndex = 0;
-
-  updateStatus('Loading playlist...');
-  els.visPlaceholder.style.display = 'none';
-
-  // Tenta pegar info após carregar
   setTimeout(() => {
-    updateStatus('Randomization');
     try {
-      const currentVideo = player.getVideoData();
-      if (currentVideo && currentVideo.video_id) {
+      const data = player.getVideoData();
+      if (data && data.video_id) {
         playlist = [{
-          id: currentVideo.video_id,
-          title: currentVideo.title || 'Playlist Track',
-          artist: currentVideo.author || 'Unknown',
+          id: data.video_id,
+          title: data.title || 'Playlist',
+          artist: data.author || 'Unknown',
           duration: 0,
-          thumbnail: `https://img.youtube.com/vi/${currentVideo.video_id}/mqdefault.jpg`
+          thumbnail: `https://img.youtube.com/vi/${data.video_id}/mqdefault.jpg`
         }];
         renderQueue();
         updateTrackInfo(0);
       }
-    } catch (e) {
-      console.log('Não foi possível obter dados da playlist');
-    }
+    } catch(e) {}
   }, 3000);
 }
 
 // ============================================
-// 8. CONTROLES DO PLAYER
+// CONTROLES
 // ============================================
 
 function togglePlay() {
-  if (!player || !player.playVideo) {
-    console.log('Player não pronto');
-    return;
-  }
-
+  if (!player || !player.playVideo) return;
   if (isPlaying) {
     player.pauseVideo();
   } else {
@@ -377,155 +212,113 @@ function togglePlay() {
 
 function stopPlayer() {
   if (!player || !player.stopVideo) return;
-
   player.stopVideo();
   isPlaying = false;
   updatePlayButton();
-  updateStatus('Ready');
   stopProgressTimer();
   stopVisualizer();
   els.progressFill.style.width = '0%';
   els.progressHandle.style.left = '0%';
   els.timeCurrent.textContent = '0:00';
-  resetPlaceholder();
+  els.visPlaceholder.style.display = 'flex';
+  els.visPlaceholder.innerHTML = '<span>▶ Cole um link do YouTube abaixo</span>';
 }
 
 function nextTrack() {
   if (playlist.length === 0) return;
-
   if (isShuffle) {
     let newIndex;
-    do {
-      newIndex = Math.floor(Math.random() * playlist.length);
-    } while (newIndex === currentTrackIndex && playlist.length > 1);
+    do { newIndex = Math.floor(Math.random() * playlist.length); }
+    while (newIndex === currentTrackIndex && playlist.length > 1);
     currentTrackIndex = newIndex;
   } else {
     currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
   }
-
   loadCurrentTrack();
 }
 
 function prevTrack() {
   if (playlist.length === 0) return;
-
   if (isShuffle) {
     let newIndex;
-    do {
-      newIndex = Math.floor(Math.random() * playlist.length);
-    } while (newIndex === currentTrackIndex && playlist.length > 1);
+    do { newIndex = Math.floor(Math.random() * playlist.length); }
+    while (newIndex === currentTrackIndex && playlist.length > 1);
     currentTrackIndex = newIndex;
   } else {
     currentTrackIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
   }
-
   loadCurrentTrack();
 }
 
 function handleTrackEnd() {
   if (currentTrackIndex < playlist.length - 1 || isShuffle) {
     nextTrack();
-  } else {
-    updateStatus('Ready');
-    stopVisualizer();
-    isPlaying = false;
-    updatePlayButton();
   }
 }
 
 function loadCurrentTrack() {
   if (currentTrackIndex < 0 || currentTrackIndex >= playlist.length) return;
-
   const track = playlist[currentTrackIndex];
-
   if (player && player.loadVideoById) {
     player.loadVideoById(track.id);
     els.visPlaceholder.style.display = 'none';
-    updateStatus('Loading...');
   }
-
   updateTrackInfo(currentTrackIndex);
   renderQueue();
 }
 
 // ============================================
-// 9. VOLUME E MUDO
+// VOLUME
 // ============================================
 
 function setVolume(value) {
   if (!player || !player.setVolume) return;
   player.setVolume(value);
-
-  const icon = els.muteBtn.querySelector('.ctrl-icon');
-  if (value == 0) {
-    icon.textContent = '🔇';
-  } else {
-    icon.textContent = isMuted ? '🔇' : '🔊';
-  }
 }
 
 function toggleMute() {
   if (!player || !player.mute || !player.unMute) return;
-
-  const icon = els.muteBtn.querySelector('.ctrl-icon');
-
   if (isMuted) {
     player.unMute();
     isMuted = false;
-    icon.textContent = '🔊';
     els.volSlider.value = player.getVolume() || 80;
   } else {
     player.mute();
     isMuted = true;
-    icon.textContent = '🔇';
     els.volSlider.value = 0;
   }
 }
 
 // ============================================
-// 10. SHUFFLE
+// SHUFFLE
 // ============================================
 
 function toggleShuffle() {
   isShuffle = !isShuffle;
   els.shuffleBadge.textContent = `Shuffle: ${isShuffle ? 'ON' : 'OFF'}`;
-
-  if (isShuffle) {
-    els.shuffleBadge.classList.add('active');
-  } else {
-    els.shuffleBadge.classList.remove('active');
-  }
+  els.shuffleBadge.classList.toggle('active', isShuffle);
 }
 
 // ============================================
-// 11. ATUALIZAR INTERFACE
+// INTERFACE
 // ============================================
 
 function updateTrackInfo(index) {
   if (index < 0 || index >= playlist.length) return;
-
   const track = playlist[index];
-
-  els.artistName.textContent = track.artist || 'Artista Desconhecido';
-  els.trackName.textContent = track.title || 'Título Desconhecido';
+  els.artistName.textContent = track.artist || 'Desconhecido';
+  els.trackName.textContent = track.title || 'Desconhecido';
   els.statusArtist.textContent = track.artist || '—';
   els.albumTitle.textContent = track.title || '—';
-
   if (track.thumbnail) {
     els.albumArt.innerHTML = `<img src="${track.thumbnail}" alt="album">`;
   } else {
-    els.albumArt.innerHTML = '<span class="album-placeholder">♪</span>';
+    els.albumArt.innerHTML = '<span>♪</span>';
   }
 }
 
 function updatePlayButton() {
-  const icon = els.playBtn.querySelector('.ctrl-icon');
-  icon.textContent = isPlaying ? '⏸' : '▶';
-  els.playBtn.title = isPlaying ? 'Pause' : 'Play';
-}
-
-function updateStatus(text) {
-  els.statusText.textContent = text;
+  els.playBtn.classList.toggle('playing', isPlaying);
 }
 
 function renderQueue() {
@@ -534,25 +327,18 @@ function renderQueue() {
     els.totalTime.textContent = '—';
     return;
   }
-
   let html = '';
   let totalSeconds = 0;
-
   playlist.forEach((track, index) => {
     const isActive = index === currentTrackIndex;
     const duration = formatTime(track.duration || 0);
-
-    html += `
-      <div class="queue-item ${isActive ? 'active' : ''}" onclick="playTrackAtIndex(${index})">
-        <span class="q-num">${index + 1}</span>
-        <span class="q-title">${escapeHtml(track.title || 'Unknown')}</span>
-        <span class="q-dur">${duration}</span>
-      </div>
-    `;
-
+    html += `<div class="queue-item ${isActive ? 'active' : ''}" onclick="playTrackAtIndex(${index})">
+      <span class="q-num">${index + 1}</span>
+      <span class="q-title">${escapeHtml(track.title || 'Unknown')}</span>
+      <span class="q-dur">${duration}</span>
+    </div>`;
     totalSeconds += track.duration || 0;
   });
-
   els.queueList.innerHTML = html;
   els.totalTime.textContent = formatTime(totalSeconds);
 }
@@ -563,24 +349,20 @@ function playTrackAtIndex(index) {
 }
 
 // ============================================
-// 12. BARRA DE PROGRESSO
+// PROGRESSO
 // ============================================
 
 function startProgressTimer() {
   stopProgressTimer();
-
   progressInterval = setInterval(() => {
     if (!player || !player.getCurrentTime) return;
-
     const current = player.getCurrentTime() || 0;
     const duration = player.getDuration() || 1;
     const percent = (current / duration) * 100;
-
     els.progressFill.style.width = percent + '%';
     els.progressHandle.style.left = percent + '%';
     els.timeCurrent.textContent = formatTime(current);
     els.timeTotal.textContent = formatTime(duration);
-
     if (playlist[currentTrackIndex] && playlist[currentTrackIndex].duration === 0) {
       playlist[currentTrackIndex].duration = duration;
       renderQueue();
@@ -589,78 +371,48 @@ function startProgressTimer() {
 }
 
 function stopProgressTimer() {
-  if (progressInterval) {
-    clearInterval(progressInterval);
-    progressInterval = null;
-  }
+  if (progressInterval) { clearInterval(progressInterval); progressInterval = null; }
 }
 
 function seekTo(event) {
   if (!player || !player.seekTo || !player.getDuration) return;
-
   const rect = event.currentTarget.getBoundingClientRect();
   const percent = (event.clientX - rect.left) / rect.width;
   const duration = player.getDuration() || 0;
-  const newTime = percent * duration;
-
-  player.seekTo(newTime, true);
+  player.seekTo(percent * duration, true);
 }
 
 // ============================================
-// 13. VISUALIZADOR (CANVAS)
+// VISUALIZADOR
 // ============================================
 
 function startVisualizer() {
   stopVisualizer();
-
   const canvas = els.visCanvas;
   const ctx = canvas.getContext('2d');
-
   const container = canvas.parentElement;
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
-
   let offset = 0;
-
   visualizerInterval = setInterval(() => {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     const barCount = 48;
     const barWidth = canvas.width / barCount;
-
     for (let i = 0; i < barCount; i++) {
-      const wave1 = Math.sin((i + offset) * 0.15) * 0.5;
-      const wave2 = Math.sin((i + offset * 0.7) * 0.25) * 0.3;
-      const random = Math.random() * 0.2;
-      const height = Math.abs(wave1 + wave2 + random) * canvas.height * 0.85;
-
-      const hue = 120 - (height / canvas.height) * 120;
-      const saturation = 80 + Math.random() * 20;
-      const lightness = 40 + (height / canvas.height) * 30;
-
-      ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-
-      const x = i * barWidth;
-      const y = canvas.height - height;
-      const gap = 1;
-
-      ctx.fillRect(x + gap/2, y, barWidth - gap, height);
+      const h = Math.abs(Math.sin((i + offset) * 0.15) * 0.5 + Math.sin((i + offset * 0.7) * 0.25) * 0.3 + Math.random() * 0.2) * canvas.height * 0.85;
+      const hue = 120 - (h / canvas.height) * 120;
+      ctx.fillStyle = `hsl(${hue}, ${80 + Math.random() * 20}%, ${40 + (h / canvas.height) * 30}%)`;
+      ctx.fillRect(i * barWidth + 0.5, canvas.height - h, barWidth - 1, h);
     }
-
     ctx.fillStyle = 'rgba(255,255,255,0.1)';
     ctx.fillRect(0, 0, canvas.width, 2);
-
     offset += 0.8;
   }, 50);
 }
 
 function stopVisualizer() {
-  if (visualizerInterval) {
-    clearInterval(visualizerInterval);
-    visualizerInterval = null;
-  }
-
+  if (visualizerInterval) { clearInterval(visualizerInterval); visualizerInterval = null; }
   const canvas = els.visCanvas;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#000';
@@ -668,11 +420,11 @@ function stopVisualizer() {
 }
 
 // ============================================
-// 14. UTILITÁRIOS
+// UTILITÁRIOS
 // ============================================
 
 function formatTime(seconds) {
-  if (!seconds || isNaN(seconds) || seconds < 0) return '0:00';
+  if (!seconds || isNaN(seconds)) return '0:00';
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -685,31 +437,21 @@ function escapeHtml(text) {
 }
 
 // ============================================
-// 15. TECLAS DE ATALHO
+// TECLAS
 // ============================================
 
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT') return;
-
   switch(e.code) {
-    case 'Space':
-      e.preventDefault();
-      togglePlay();
-      break;
-    case 'ArrowRight':
-      nextTrack();
-      break;
-    case 'ArrowLeft':
-      prevTrack();
-      break;
-    case 'KeyM':
-      toggleMute();
-      break;
+    case 'Space': e.preventDefault(); togglePlay(); break;
+    case 'ArrowRight': nextTrack(); break;
+    case 'ArrowLeft': prevTrack(); break;
+    case 'KeyM': toggleMute(); break;
   }
 });
 
 // ============================================
-// 16. INICIALIZAÇÃO
+// INICIALIZAÇÃO
 // ============================================
 
 window.addEventListener('load', () => {
@@ -717,24 +459,30 @@ window.addEventListener('load', () => {
   const container = canvas.parentElement;
   canvas.width = container.clientWidth;
   canvas.height = container.clientHeight;
-
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   els.urlInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      loadURL();
-    }
+    if (e.key === 'Enter') loadURL();
   });
+
+  // Ajusta escala para caber na tela
+  adjustScale();
 });
 
-window.addEventListener('resize', () => {
-  const canvas = els.visCanvas;
-  const container = canvas.parentElement;
-  canvas.width = container.clientWidth;
-  canvas.height = container.clientHeight;
-});
+window.addEventListener('resize', adjustScale);
+
+function adjustScale() {
+  const wrapper = document.querySelector('.player-wrapper');
+  if (!wrapper) return;
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+  const scaleX = (windowWidth - 20) / 1440;
+  const scaleY = (windowHeight - 20) / 1000;
+  const scale = Math.min(scaleX, scaleY, 1);
+  wrapper.style.transform = `scale(${scale})`;
+  wrapper.style.transformOrigin = 'center center';
+}
 
 console.log('🎧 XP Music Player carregado!');
-console.log('💡 Cole um link do YouTube e clique em Load');

@@ -15,3 +15,4 @@ Cole um link do YouTube e ouça direto no navegador.
 
 ## Aviso
 Como o player usa links do YouTube, ele pode bloquear reprodução em domínios não autorizados.
+Ainda está em construção, erros e bugs serão concertados em breve.

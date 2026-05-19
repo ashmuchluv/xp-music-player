@@ -27,7 +27,7 @@ Este projeto é uma reconstrução da interface clássica do player de música d
 ## 🔧 Acesse o projeto [Clicando Aqui](https://ashmuchluv.github.io/xp-music-player/)
 
 <p align="left">
-  <img src="playerimg.jpg" alt="Preview do XP Music Player" width="550">
+  <img src="playerimg.png" alt="Preview do XP Music Player" width="550">
 </p>
 
 ---

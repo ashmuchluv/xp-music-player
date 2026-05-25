@@ -467,12 +467,6 @@ window.addEventListener('load', () => {
     if (e.key === 'Enter') loadURL();
   });
 
-  // Ajusta escala para caber na tela
-  adjustScale();
-});
-
-window.addEventListener('resize', adjustScale);
-
 function adjustScale() {
   const wrapper = document.querySelector('.player-wrapper');
   if (!wrapper) return;
